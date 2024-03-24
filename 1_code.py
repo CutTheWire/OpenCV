@@ -29,7 +29,7 @@ class SeedC:
                 cY = int(M["m01"] / M["m00"])
                 cv2.putText(self.result_image, str(i + 1), (cX, cY), self.font, 1, (0, 0, 255), 2)
         return self.result_image
-
+    
 if __name__ == "__main__":
     SC = SeedC('./seed_count_image.jpg')
     contours = SC.find_contours()
