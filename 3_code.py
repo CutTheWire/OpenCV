@@ -117,7 +117,7 @@ if __name__ == "__main__":
     thresh = IS.apply_threshold()
     opening = IS.remove_noise(thresh)
     sure_bg, sure_fg, unknown = IS.get_background_foreground(opening)
-    print(type(sure_bg), type(sure_fg), type(unknown))
+
     image = IS.apply_watershed(sure_fg, unknown)
     contours = IS.find_contours(sure_fg)
     annotated_image = IS.annotate_contours(image, contours)  # 수정된 메소드 호출
