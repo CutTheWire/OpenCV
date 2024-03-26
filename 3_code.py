@@ -1,27 +1,51 @@
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
+from typing import Union
 
 class ImageSegmenter:
-    def __init__(self, image_path):
+    def __init__(self, image_path) -> None:
         self.image_path = image_path
         self.img = cv2.imread(self.image_path)
         self.gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         self.kernel = np.ones((3,3), np.uint8)
         self.result_image = self.img.copy()  # result_image 속성 추가
 
-    def apply_threshold(self):
-        """이미지에 임계값을 적용하여 이진 이미지 생성"""
-        _, thresh = cv2.threshold(self.gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    def apply_threshold(self) -> np.ndarray:
+        """
+        이미지에 임계값을 적용하여 이진 이미지를 생성합니다.
+
+        Returns:
+        - thresh: 임계값 적용 후의 이진화된 이미지입니다.
+        """
+        _, thresh = cv2.threshold(self.gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)        
         return thresh
 
-    def remove_noise(self, thresh):
-        """노이즈 제거"""
+    def remove_noise(self, thresh: np.ndarray) -> np.ndarray:
+        """
+        노이즈를 제거합니다.
+        
+        Args:
+        - thresh: 이진화된 이미지입니다.
+        
+        Returns:
+        - opening: 노이즈가 제거된 이미지입니다.
+        """
         opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, self.kernel, iterations = 2)
         return opening
 
-    def get_background_foreground(self, opening):
-        """배경 및 전경 영역 확실하게 설정"""
+    def get_background_foreground(self, opening) -> Union[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        배경 및 전경 영역을 확실하게 설정합니다.
+        
+        Args:
+        - opening: 노이즈가 제거된 이미지입니다.
+        
+        Returns:
+        - sure_bg: 배경이 확실한 영역입니다.
+        - sure_fg: 전경이 확실한 영역입니다.
+        - unknown: 배경과 전경을 구분할 수 없는 영역입니다.
+        """
         sure_bg = cv2.dilate(opening, self.kernel, iterations=3)
         dist_transform = cv2.distanceTransform(opening, cv2.DIST_L2, 5)
         _, sure_fg = cv2.threshold(dist_transform, 0.4*dist_transform.max(), 255, 0)
@@ -29,8 +53,17 @@ class ImageSegmenter:
         unknown = cv2.subtract(sure_bg, sure_fg)
         return sure_bg, sure_fg, unknown
 
-    def apply_watershed(self, sure_fg, unknown):
-        """워터셰드 알고리즘 적용"""
+    def apply_watershed(self, sure_fg: np.ndarray, unknown: np.ndarray) -> np.ndarray:
+        """
+        워터셰드 알고리즘을 적용합니다.
+        
+        Args:
+        - sure_fg: 전경이 확실한 영역입니다.
+        - unknown: 배경과 전경을 구분할 수 없는 영역입니다.
+        
+        Returns:
+        - self.img: 워터셰드 알고리즘 적용 후의 이미지입니다.
+        """
         _, markers = cv2.connectedComponents(sure_fg)
         markers = markers+1
         markers[unknown==255] = 0
@@ -38,12 +71,12 @@ class ImageSegmenter:
         self.img[markers == -1] = [255,0,0]
         return self.img
     
-    def find_contours(self, sure_fg) -> np.ndarray:
+    def find_contours(self, sure_fg: np.ndarray) -> np.ndarray:
         """
         이진화된 이미지에서 윤곽선을 찾습니다.
 
         Returns:
-        - 찾아진 윤곽선 목록
+        - contours: 찾아진 윤곽선 목록
         """
         contours, _ = cv2.findContours(sure_fg, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         return contours
@@ -53,13 +86,13 @@ class ImageSegmenter:
         이미지를 그레이스케일로 변환한 후 이진화를 수행합니다.
 
         Returns:
-        - 이진화된 이미지
+        - cv2.bitwise_not(thresh): 이진화된 이미지
         """
         gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         _, thresh = cv2.threshold(gray, self.threshold, 255, cv2.THRESH_BINARY)
         return cv2.bitwise_not(thresh)
     
-    def annotate_contours(self, image, contours: np.ndarray) -> np.ndarray:
+    def annotate_contours(self, image: np.uint8, contours: np.ndarray) -> np.ndarray:
         """
         윤곽선을 이미지에 그리고, 각 윤곽선의 중심에 번호를 부여합니다.
 
@@ -68,7 +101,7 @@ class ImageSegmenter:
         - contours: 윤곽선 목록
 
         Returns:
-        - 윤곽선과 번호가 추가된 이미지
+        - image: 윤곽선과 번호가 추가된 이미지
         """
         for i, contour in enumerate(contours):
             M = cv2.moments(contour)
@@ -84,7 +117,7 @@ if __name__ == "__main__":
     thresh = IS.apply_threshold()
     opening = IS.remove_noise(thresh)
     sure_bg, sure_fg, unknown = IS.get_background_foreground(opening)
-
+    print(type(sure_bg), type(sure_fg), type(unknown))
     image = IS.apply_watershed(sure_fg, unknown)
     contours = IS.find_contours(sure_fg)
     annotated_image = IS.annotate_contours(image, contours)  # 수정된 메소드 호출
