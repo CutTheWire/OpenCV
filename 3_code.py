@@ -48,6 +48,8 @@ class ImageSegmenter:
         """
         sure_bg = cv2.dilate(opening, self.kernel, iterations=3)
         dist_transform = cv2.distanceTransform(opening, cv2.DIST_L2, 5)
+        plt.imshow(dist_transform)
+        plt.show()
         _, sure_fg = cv2.threshold(dist_transform, 0.4*dist_transform.max(), 255, 0)
         sure_fg = np.uint8(sure_fg)
         unknown = cv2.subtract(sure_bg, sure_fg)
