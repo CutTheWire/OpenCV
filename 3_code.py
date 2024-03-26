@@ -9,6 +9,7 @@ class ImageSegmenter:
         self.img = cv2.imread(self.image_path)
         self.gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         self.kernel = np.ones((3,3), np.uint8)
+        self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.result_image = self.img.copy()  # result_image 속성 추가
 
     def apply_threshold(self) -> np.ndarray:
@@ -122,6 +123,7 @@ if __name__ == "__main__":
 
     image = IS.apply_watershed(sure_fg, unknown)
     contours = IS.find_contours(sure_fg)
+    cv2.putText(image, f"seed count: {len(contours)}", (30, 70), IS.font, 2, (0, 0, 255), 2)
     annotated_image = IS.annotate_contours(image, contours)  # 수정된 메소드 호출
     plt.imshow(annotated_image)
     plt.show()
