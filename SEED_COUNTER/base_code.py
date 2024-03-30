@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import copy
 
-image = cv2.imread('./seed_count_image.jpg')
+image = cv2.imread('SEED_COUNTER\seed_count_image.jpg')
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 _, thresh = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY)
 
