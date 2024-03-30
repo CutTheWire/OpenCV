@@ -115,7 +115,7 @@ class ImageSegmenter:
         return image
 
 if __name__ == "__main__":
-    image_path = 'seed_count_image.jpg'
+    image_path = 'SEED_COUNTER\seed_count_image.jpg'
     IS = ImageSegmenter(image_path)
     thresh = IS.apply_threshold()
     opening = IS.remove_noise(thresh)

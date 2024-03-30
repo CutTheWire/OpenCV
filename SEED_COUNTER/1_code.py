@@ -31,7 +31,7 @@ class SeedC:
         return self.result_image
     
 if __name__ == "__main__":
-    SC = SeedC('./seed_count_image.jpg')
+    SC = SeedC('SEED_COUNTER\seed_count_image.jpg')
     contours = SC.find_contours()
     result_image = SC.annotate_contours(contours)
 

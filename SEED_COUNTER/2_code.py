@@ -108,7 +108,7 @@ class SeedC:
         return iqr_mean
     
 if __name__ == "__main__":
-    SC = SeedC('./seed_count_image.jpg')
+    SC = SeedC('SEED_COUNTER\seed_count_image.jpg')
     contours = SC.find_contours()
     SC.Area_contours(contours)
     value = SC.median_value_contours()

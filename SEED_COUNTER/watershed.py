@@ -3,7 +3,7 @@ import cv2
 from matplotlib import pyplot as plt
 
 # 이미지 로드
-img = cv2.imread('seed_min_image.jpg')
+img = cv2.imread('SEED_COUNTER\seed_min_image.jpg')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 # 시각화
 fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(10, 7))
