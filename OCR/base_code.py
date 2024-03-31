@@ -12,7 +12,7 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tess
 
 # 이미지 로드 및 OCR을 통한 텍스트 인식
 img = Image.open('OCR\대한민국헌법(제00010호).png')
-text = pytesseract.image_to_string(img, lang="eng+kor")
+text = pytesseract.image_to_string(img, lang="kor")
 
 # 지정한 텍스트가 있는지 확인 (영어)
 search_text = '민주'
